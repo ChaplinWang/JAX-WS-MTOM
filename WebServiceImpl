@@ -1,0 +1,49 @@
+    
+package com.cw.fsm.server.webserviceimpl;
+
+import javax.activation.DataHandler;
+import javax.annotation.Resource;
+import javax.jws.WebParam;
+import javax.persistence.NoResultException;
+import javax.xml.bind.annotation.XmlMimeType;
+import javax.xml.ws.soap.MTOM;
+import java.io.IOException;
+import java.io.InputStream;
+import java.text.SimpleDateFormat;
+import java.util.Properties;
+
+@MTOM(enabled = true)
+public class WebServiceImpl implements WebService
+{    
+    @Override
+    public void uploadAttachment(@WebParam(name = "Id") Long Id,
+                                 @WebParam(name = "fileName") String targetFileName,
+                                 @XmlMimeType("application/octet-stream") DataHandler data)
+        throws ParameterIsRequiredException, ValidationException, IOException
+    {
+        errorIfNull(jobTicketId, "Parameter Id cannot be null.");
+        errorIfNull(targetFileName, "Parameter targetFileName cannot be null.");
+        errorIfNull(targetFileName, "No Attachment found in request.");
+        if (!targetFileName.matches(".*\\..*"))
+        {
+            throw new ValidationException("invalid file name: " + targetFileName);
+        }
+
+        final InputStream in = data.getInputStream();
+        byte[] byteArray = org.apache.commons.io.IOUtils.toByteArray(in);
+
+        int extensionSplitterIndex = targetFileName.lastIndexOf('.');cl
+
+
+        String fileName = targetFileName.substring(0, extensionSplitterIndex);
+        String fileType = targetFileName.substring(extensionSplitterIndex + 1, targetFileName.length());
+
+        FileUploadRequest request =
+            new FileUploadRequest(Id, fileName, fileType, byteArray);
+        GeneralUpdateResponse response = internalCommandService.executeInner(request);
+
+        if (!response.getSuccess())
+        {
+            throw new ValidationException(response.getRemarks());
+        }
+}
