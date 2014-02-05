@@ -1,0 +1,23 @@
+package com.cw.server.webservice;
+
+import com.cw.server.dto.FsmJobTicketDetailsDTO;
+import com.cw.webservices.server.exception.NoResultException;
+import com.cw.webservices.server.exception.ParameterIsRequiredException;
+import com.cw.webservices.server.exception.ValidationException;
+
+import javax.activation.DataHandler;
+import javax.jws.WebParam;
+import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlMimeType;
+import java.io.IOException;
+
+@WebService
+public interface WebService
+{
+
+   
+    void uploadJobTicketAttachment(@WebParam(name = "jobTicketId") Long jobTicketId,
+                                   @WebParam(name = "fileName") String targetFileName,
+                                   @XmlMimeType("application/octet-stream") DataHandler data)
+        throws ParameterIsRequiredException, ValidationException, IOException;
+}
